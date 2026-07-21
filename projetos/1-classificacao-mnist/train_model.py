@@ -57,9 +57,14 @@ print(f"\nAcuracia final de validacao: {acc_final:.4f}")
 _, test_acc = model.evaluate(x_test, y_test, verbose=0)
 print(f"Acuracia obtida no teste: {test_acc:.4f}\n")
 
-# 7. Gravar salvando apenas os pesos e arquitetura de forma limpa
+# 7. Gravar salvando com compatibilidade retroativa para Keras 2 / GitHub Actions
+try:
+    # Utiliza o módulo de salvamento legado do TensorFlow se disponível
+    tf.keras.saving.legacy.save_model(model, "model.h5")
+except AttributeError:
+    # Fallback padrão
+    model.save("model.h5", include_optimizer=False)
 
-model.save("model.h5", include_optimizer=False)
 print("Modelo guardado com sucesso!")
 
 
