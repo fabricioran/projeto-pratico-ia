@@ -58,8 +58,10 @@ _, test_acc = model.evaluate(x_test, y_test, verbose=0)
 print(f"Acuracia obtida no teste: {test_acc:.4f}\n")
 
 # 7. Gravar salvando apenas os pesos e arquitetura de forma limpa
-model.save_weights("model.h5")
+
+model.save("model.h5", include_optimizer=False)
 print("Modelo guardado com sucesso!")
+
 
 idx = np.random.randint(0, len(x_test))
 pred = model.predict(np.expand_dims(x_test[idx], axis=0), verbose=0)
