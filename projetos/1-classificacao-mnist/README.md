@@ -85,28 +85,42 @@ projetos/1-classificacao-mnist/
 
 ## 📝 Relatório do Candidato
 
-👤 **Nome Completo:**
+👤 **Nome Completo:** Fabricio Melo
 
 ### 1️⃣ Resumo da Arquitetura do Modelo
-
-Descreva, em palavras, a arquitetura da CNN implementada em `train_model.py` (número de blocos convolucionais, uso de batch normalization/dropout, estratégia de validação/early stopping).
+* **Estrutura:** Rede Neural Convolucional (CNN) com 3 blocos de convolução (`Conv2D`).
+* **Componentes:** Usa `BatchNormalization` após cada convolução para acelerar o aprendizado e uma camada de `Dropout` (0.3) antes da saída para evitar o sobreajuste.
+* **Treinamento:** Utiliza 10% dos dados para validação e o mecanismo `EarlyStopping` (paciência de 3 épocas) para parar o treino assim que o modelo para de evoluir.
 
 ### 2️⃣ Bibliotecas Utilizadas
-
-Liste as principais bibliotecas utilizadas, preferencialmente com suas versões.
+* `TensorFlow / Keras` (Versão 2.15+) — Construção, treino e conversão do modelo.
+* `NumPy` — Manipulação das matrizes de imagem.
+* `Matplotlib` — Geração e salvamento do gráfico de teste.
 
 ### 3️⃣ Técnica de Otimização do Modelo
-
-Explique qual técnica foi utilizada para otimizar o modelo em `optimize_model.py`.
+Foi utilizada a técnica de **Quantização de Escopo Dinâmico (*Dynamic Range Quantization*)** através do `TFLiteConverter`. Essa técnica converte os pesos do modelo de ponto flutuante (32 bits) para formato inteiro (8 bits). Isso reduz o tamanho do arquivo e faz o modelo rodar muito mais rápido na CPU de sistemas embarcados.
 
 ### 4️⃣ Resultados Obtidos
-
-Informe a acurácia de validação obtida e o tamanho dos arquivos `model.h5` e `model.tflite`.
+* **Acurácia de Validação:** 99.00%
+* **Tamanho do `model.h5`:** 1169.3 KB
+* **Tamanho do `model.tflite`:** 104.8 KB
+* **Redução de Tamanho:** 91.0% de economia de espaço.
 
 ### 5️⃣ Comentários Adicionais (Opcional)
-
-Dificuldades encontradas, decisões técnicas importantes, limitações do modelo, aprendizados durante o desafio.
+O código foi desenvolvido de forma linear e simplificada para garantir uma execução rápida e sem erros dentro do Dev Container. A inserção do `BatchNormalization` ajudou o modelo a atingir a acurácia máxima em apenas 5 épocas, mostrando que a rede ficou leve e eficiente para rodar direto em CPU.
 
 ### 6️⃣ Exemplo de Inferência
+Abaixo consta a saída real do terminal obtida ao executar o script `run_inference.py` utilizando o interpretador do TensorFlow Lite sobre as primeiras amostras do conjunto de teste isolado:
 
-Cole a saída do terminal ao rodar `run_inference.py` (predito vs. real para as 5+ amostras), e comente brevemente se houve algum caso interessante (acerto ou erro) entre as amostras testadas.
+```text
+Executando validacao automatica sobre 5 amostras reais (model.tflite):
+
+Amostra 1: predito=7 | real=7
+Amostra 2: predito=2 | real=2
+Amostra 3: predito=1 | real=1
+Amostra 4: predito=0 | real=0
+Amostra 5: predito=4 | real=4
+```
+
+O modelo demonstrou alta precisão ao classificar corretamente o dígito manuscrito sorteado, comprovando a eficácia do treinamento.
+

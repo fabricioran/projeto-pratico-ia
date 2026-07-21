@@ -1,40 +1,43 @@
+#!/usr/bin/env python3
+import os
 import numpy as np
 import tensorflow as tf
 
 # ---------------------------------------------------------------------------
 # Projeto 1 — Inferência com o Modelo Otimizado (model.tflite)
-#
-# Requisitos (veja README.md desta pasta para detalhes completos):
-#   1. Carregar especificamente o "model.tflite" (o artefato de edge, não o
-#      model.h5) usando tf.lite.Interpreter
-#   2. Rodar inferência em pelo menos 5 amostras do conjunto de teste do MNIST
-#   3. Imprimir no terminal, para cada amostra: classe predita vs. classe real
 # ---------------------------------------------------------------------------
 
-N_SAMPLES = 5
-
-
 def main():
-    import os
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    interpreter = tf.lite.Interpreter(model_path=os.path.join(script_dir, "model.tflite"))
-    interpreter.allocate_tensors()
-    input_details = interpreter.get_input_details()
-    output_details = interpreter.get_output_details()
+    # 1. Localizar e carregar estritamente o artefato de edge usando tf.lite.Interpreter
+    diretorio_atual = os.path.dirname(os.path.abspath(__file__))
+    caminho_tflite = os.path.join(diretorio_atual, "model.tflite")
+    
+    interpretador = tf.lite.Interpreter(model_path=caminho_tflite)
+    interpretador.allocate_tensors()
+    
+    detalhes_entrada = interpretador.get_input_details()
+    detalhes_saida = interpretador.get_output_details()
 
-    (_, _), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
-    x_test = x_test.astype("float32") / 255.0
-    x_test = np.expand_dims(x_test, axis=-1)
+    # Carregar dados oficiais de teste para validacao pontual
+    (_, _), (imagens_teste, gabarito_teste) = tf.keras.datasets.mnist.load_data()
+    imagens_teste = imagens_teste.astype("float32") / 255.0
+    imagens_teste = np.expand_dims(imagens_teste, axis=-1)
 
-    print(f"Rodando inferencia em {N_SAMPLES} amostras usando model.tflite:\n")
-    for i in range(N_SAMPLES):
-        sample = np.expand_dims(x_test[i], axis=0).astype(input_details[0]["dtype"])
-        interpreter.set_tensor(input_details[0]["index"], sample)
-        interpreter.invoke()
-        pred = interpreter.get_tensor(output_details[0]["index"])[0]
-        predicted_class = int(np.argmax(pred))
-        print(f"Amostra {i + 1}: predito={predicted_class} | real={int(y_test[i])}")
-
+    print("Executando validacao automatica sobre 5 amostras reais (model.tflite):\n")
+    
+    # 2. Iteracao obrigatoria de amostragem
+    for i in range(5):
+        vetor_entrada = np.expand_dims(imagens_teste[i], axis=0)
+        
+        interpretador.set_tensor(detalhes_entrada[0]["index"], vetor_entrada)
+        interpretador.invoke()
+        
+        vetor_saida = interpretador.get_tensor(detalhes_saida[0]["index"])[0]
+        numero_predito = int(np.argmax(vetor_saida))
+        numero_real = int(gabarito_teste[i])
+        
+        # 3. Exibicao exigida: classe predita vs classe real
+        print(f"Amostra {i + 1}: predito={numero_predito} | real={numero_real}")
 
 if __name__ == "__main__":
     main()
