@@ -1,3 +1,8 @@
+import os
+
+# ⚠️ FORÇA O TENSORFLOW A USAR O KERAS 2 (FORMATO LEGADO COMPATÍVEL COM O CI)
+os.environ["TF_USE_LEGACY_KERAS"] = "1"
+
 import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
@@ -7,7 +12,7 @@ import tensorflow as tf
 # 1. Pegar dados do MNIST
 (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
 
-# 2. Arrumar escala para e ajustar dimensões
+# 2. Arrumar escala e ajustar dimensões
 x_train = x_train.astype("float32") / 255.0
 x_test = x_test.astype("float32") / 255.0
 
@@ -18,7 +23,7 @@ x_test = np.expand_dims(x_test, axis=-1)
 y_train = tf.keras.utils.to_categorical(y_train, 10)
 y_test = tf.keras.utils.to_categorical(y_test, 10)
 
-# 4. Criar a rede sequencial com sintaxe estrita e posicional (Compatibilidade Total)
+# 4. Criar a rede sequencial
 model = tf.keras.Sequential([
     tf.keras.layers.Conv2D(32, (3, 3), activation="relu", input_shape=(28, 28, 1)),
     tf.keras.layers.BatchNormalization(),
@@ -57,17 +62,11 @@ print(f"\nAcuracia final de validacao: {acc_final:.4f}")
 _, test_acc = model.evaluate(x_test, y_test, verbose=0)
 print(f"Acuracia obtida no teste: {test_acc:.4f}\n")
 
-# 7. Gravar salvando com compatibilidade retroativa para Keras 2 / GitHub Actions
-try:
-    # Utiliza o módulo de salvamento legado do TensorFlow se disponível
-    tf.keras.saving.legacy.save_model(model, "model.h5")
-except AttributeError:
-    # Fallback padrão
-    model.save("model.h5", include_optimizer=False)
+# 7. Gravar o modelo no formato nativo do Keras 2
+model.save("model.h5")
+print("Modelo guardado com sucesso no formato Keras 2!")
 
-print("Modelo guardado com sucesso!")
-
-
+# Exemplo visual
 idx = np.random.randint(0, len(x_test))
 pred = model.predict(np.expand_dims(x_test[idx], axis=0), verbose=0)
 
