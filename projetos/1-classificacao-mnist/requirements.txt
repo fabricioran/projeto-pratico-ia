@@ -1,7 +1,4 @@
 tensorflow>=2.12
+tf-keras
 numpy
-
-
-
-
-
+matplotlib
