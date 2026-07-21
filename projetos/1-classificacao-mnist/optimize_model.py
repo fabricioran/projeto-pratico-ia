@@ -1,26 +1,25 @@
-import os
 import tensorflow as tf
+import os
 
-# Carrega o modelo com tratamento de compatibilidade
-try:
-    import tf_keras as keras
-    model = keras.models.load_model("model.h5")
-except Exception:
-    try:
-        model = tf.keras.saving.legacy.load_model("model.h5")
-    except Exception:
-        model = tf.keras.models.load_model("model.h5")
+# ---------------------------------------------------------------------------
+# Projeto 1 — Otimização do Modelo (MNIST)
+#
+# Requisitos (veja README.md desta pasta para detalhes completos):
+#   1. Carregar o modelo treinado em "model.h5"
+#   2. Converter para TensorFlow Lite usando tf.lite.TFLiteConverter
+#   3. Aplicar uma técnica de otimização (ex: Dynamic Range Quantization,
+#      via converter.optimizations = [tf.lite.Optimize.DEFAULT])
+#   4. Salvar o resultado como "model.tflite"
+# ---------------------------------------------------------------------------
 
-# 1. Converter para TensorFlow Lite
+model = tf.keras.models.load_model("model.h5")
+
 converter = tf.lite.TFLiteConverter.from_keras_model(model)
-
-# 2. Aplicar otimização explícita (Dynamic Range Quantization)
 converter.optimizations = [tf.lite.Optimize.DEFAULT]
 
 tflite_model = converter.convert()
 
-# 3. Salvar como model.tflite
 with open("model.tflite", "wb") as f:
     f.write(tflite_model)
 
-print("Modelo otimizado salvo em 'model.tflite' com sucesso!")
+print("Modelo otimizado salvo em model.tflite")
